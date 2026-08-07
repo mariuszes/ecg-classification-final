@@ -1,0 +1,47 @@
+# generated datasets
+data/processed/*
+!data/processed/.gitkeep
+
+# source datasets 
+data/ptb-xl-plus/*
+!data/ptb-xl-plus/.gitkeep
+
+# generated models
+models/*
+!models/.gitkeep
+!models/baseline/
+!models/production/
+
+models/baseline/*
+models/production/*
+
+!models/baseline/.gitkeep
+!models/production/.gitkeep
+
+# mlflow data
+mlflow/*
+!mlflow/.gitkeep
+
+# git
+.git 
+
+# python cache
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# virtual environment
+.venv/
+venv/
+
+# environment files
+.env
+.env.*
+!.env.example
+
+# ide
+.idea/
+.vscode/
+
+# grafana cloud token
+prometheus/grafana-cloud-token.txt

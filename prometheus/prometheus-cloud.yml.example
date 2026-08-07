@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 2s
+  scrape_timeout: 1s
+
+scrape_configs:
+  - job_name: ecg-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["api:8000"]
+
+remote_write:
+  - url: "GRAFANA_CLOUD_PROMETHEUS_URL"
+    basic_auth:
+      username: "GRAFANA_CLOUD_USERNAME"
+      password_file: /etc/prometheus/grafana-cloud-token.txt
+    write_relabel_configs:
+      - source_labels: [__name__]
+        regex: ecg_feature_drift_score
+        action: keep
+
+
+# Add this volume to the Prometheus service in Docker Compose:
+# - ./prometheus/grafana-cloud-token.txt:/etc/prometheus/grafana-cloud-token.txt:ro

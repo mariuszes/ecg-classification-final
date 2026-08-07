@@ -1,0 +1,36 @@
+# git
+.git 
+.gitignore
+
+# python cache
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# virtual environment
+.venv/
+venv/
+
+# environment files
+.env
+.env.*
+!.env.example
+
+# ide
+.idea/
+.vscode/
+
+# project files not needed in the image
+notebooks/
+tests/
+data/
+models/
+mlflow/
+grafana/
+prometheus/
+
+README.md
+Makefile
+requirements-dev.txt
+run_ml_pipeline.ps1
+docker-compose.yml
