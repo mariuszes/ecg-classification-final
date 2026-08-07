@@ -1,0 +1,81 @@
+name: ECG Classification CI
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pipeline-tests:
+    name: Run ML pipeline and integration tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Prepare writable directories
+        run: chmod -R 777 data/processed models mlflow
+
+      - name: Start Docker Compose
+        run: make up
+
+      - name: Wait for MLflow
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:5000/health; then
+              echo "MLflow is healthy"
+              exit 0
+            fi
+
+            echo "Waiting for MLflow..."
+            sleep 2
+          done
+
+          echo "MLflow did not become healthy"
+          docker compose logs --no-color mlflow
+          exit 1
+
+      - name: Run complete ML pipeline
+        run: make full-pipeline
+
+      - name: Wait for API health
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:8000/health; then
+              echo "API is healthy"
+              exit 0
+            fi
+
+            echo "Waiting for API..."
+            sleep 2
+          done
+
+          echo "API did not become healthy"
+          docker compose logs --no-color api
+          exit 1
+
+      - name: Run tests
+        run: pytest tests -v
+
+      - name: Show Docker logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+
+      - name: Stop Docker Compose stack
+        if: always()
+        run: docker compose down -v
